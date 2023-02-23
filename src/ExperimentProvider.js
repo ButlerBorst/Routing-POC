@@ -106,6 +106,7 @@ const ExperimentProvider = ({ children }) => {
         if (prevLocationIndex === currentScreenIndex) {
           console.log("WERE THE SAME");
         }
+        //both work without popping state
         if (prevLocationIndex > currentScreenIndex) {
           if (!isEqual(location.state, experimentState.screen)) {
             console.log("RETURNING?");
@@ -118,6 +119,7 @@ const ExperimentProvider = ({ children }) => {
           if (!isEqual(location.state, experimentState.screen)) {
             console.log("PROCEEDING?", experimentState.screen);
             // if (!experimentState.screen.firstRoute) {
+
             dispatchExperimentState({
               type: "PROCEED",
             });
@@ -127,10 +129,11 @@ const ExperimentProvider = ({ children }) => {
       }
 
       if (type === "REPLACE") {
-        dispatchExperimentState({
-          type: "FORCESCREENUPDATE",
-          payload: experimentState.screen,
-        });
+        console.log("TYPE IS REPLACE?", type);
+        // dispatchExperimentState({
+        //   type: "FORCESCREENUPDATE",
+        //   payload: experimentState.screen,
+        // });
         console.log("WERE replacing with no screen change");
       }
       if (type === "POP") {
@@ -151,7 +154,12 @@ const ExperimentProvider = ({ children }) => {
             prevLocationIndex
           );
           // navigate("/", { state: experimentState.screen, replace: false });
-          if (currentScreenIndex > prevLocationIndex) {
+          navigate("/", { state: null, replace: true });
+          dispatchExperimentState({
+            type: "FORCESCREENUPDATE",
+            payload: experimentState.screen,
+          });
+          if (currentScreenIndex < prevLocationIndex) {
             console.log(
               "in first route and are popping",
               experimentState.screen,
