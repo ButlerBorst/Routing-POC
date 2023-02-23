@@ -117,11 +117,11 @@ const ExperimentProvider = ({ children }) => {
         if (currentScreenIndex > prevLocationIndex) {
           if (!isEqual(location.state, experimentState.screen)) {
             console.log("PROCEEDING?", experimentState.screen);
-            if (!experimentState.screen.firstRoute) {
-              dispatchExperimentState({
-                type: "PROCEED",
-              });
-            }
+            // if (!experimentState.screen.firstRoute) {
+            dispatchExperimentState({
+              type: "PROCEED",
+            });
+            // }
           }
         }
       }
@@ -150,24 +150,25 @@ const ExperimentProvider = ({ children }) => {
             "prev:",
             prevLocationIndex
           );
+          // navigate("/", { state: experimentState.screen, replace: false });
           if (currentScreenIndex > prevLocationIndex) {
             console.log(
               "in first route and are popping",
               experimentState.screen,
               location.state
             );
-            navigate("/", { state: null, replace: true });
-            dispatchExperimentState({
-              type: "FORCESCREENUPDATE",
-              payload: experimentState.screen,
-            });
-          } else {
-            navigate("/", { state: null, replace: true });
             // dispatchExperimentState({
             //   type: "FORCESCREENUPDATE",
             //   payload: experimentState.screen,
             // });
           }
+          // else {
+          //   navigate("/", { state: null, replace: true });
+          //   // dispatchExperimentState({
+          //   //   type: "FORCESCREENUPDATE",
+          //   //   payload: experimentState.screen,
+          //   // });
+          // }
         }
       }
     }

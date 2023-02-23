@@ -15,7 +15,7 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { experimentState } = useExperimentContext();
+  const { experimentState, remove } = useExperimentContext();
 
   const ScreenView =
     ScreenList[location?.state?.screen || experimentState?.screen?.screen];
@@ -23,6 +23,9 @@ export default function App() {
   const OverlayView = ScreenList[experimentState?.screen?.screen];
   return (
     <div className="App">
+      <div style={{ position: "absolute", top: "10%" }}>
+        <button onClick={() => remove("routing-test")}>Remove storage</button>
+      </div>
       <div className="mobile-container">
         {experimentState?.screen?.screenType === "overlay" && (
           <Overlay componentToOverlay={<OverlayView />} />
