@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useEffectOnce } from "react-use";
+import { ScreenConfig } from "../Exp1Config";
 import { useExperimentContext } from "../ExperimentProvider";
 
 export default function Screen4(props) {
@@ -12,9 +13,12 @@ export default function Screen4(props) {
   });
 
   const proceedWithNext = () => {
+    const nextRoundPage = ScreenConfig.screens.find((configScreen) => {
+      return configScreen.nextRoundPage;
+    });
     const currentItem = experimentState.items.indexOf(experimentState.item);
     setValue(experimentState.items[currentItem + 1]);
-    dispatchExperimentState({ type: "STARTNEXTROUND" });
+    dispatchExperimentState({ type: "SKIPROUND", payload: nextRoundPage });
   };
   return (
     <div style={{ display: display }} className="layout route">

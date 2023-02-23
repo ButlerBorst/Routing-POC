@@ -29,7 +29,6 @@ const ExperimentProvider = ({ children }) => {
     ExpermientStateReducer,
     initState
   );
-  console.log("experimentState: ", experimentState.screen);
 
   const [value, setValue, remove] = useLocalStorage("routing-test", null);
 
@@ -79,11 +78,7 @@ const ExperimentProvider = ({ children }) => {
   }, [experimentState.screen]);
 
   useEffect(() => {
-    console.log("location", location.state);
-    console.log("prevLocation", prevLocation?.state);
-
     if (location.state) {
-      //WORKS FOR NOW
       if (experimentState.screen.screenType === "overlay") {
         dispatchExperimentState({
           type: "FORCESCREENUPDATE",
@@ -102,14 +97,11 @@ const ExperimentProvider = ({ children }) => {
         }
       );
       if (experimentState.screen.screenType === "route") {
-        console.log(currentScreenIndex, prevLocationIndex);
         if (prevLocationIndex === currentScreenIndex) {
           console.log("WERE THE SAME");
         }
-        //both work without popping state
         if (prevLocationIndex > currentScreenIndex) {
           if (!isEqual(location.state, experimentState.screen)) {
-            console.log("RETURNING?");
             dispatchExperimentState({
               type: "RETURN",
             });
@@ -117,24 +109,15 @@ const ExperimentProvider = ({ children }) => {
         }
         if (currentScreenIndex > prevLocationIndex) {
           if (!isEqual(location.state, experimentState.screen)) {
-            console.log("PROCEEDING?", experimentState.screen);
-            // if (!experimentState.screen.firstRoute) {
-
             dispatchExperimentState({
               type: "PROCEED",
             });
-            // }
           }
         }
       }
 
       if (type === "REPLACE") {
         console.log("TYPE IS REPLACE?", type);
-        // dispatchExperimentState({
-        //   type: "FORCESCREENUPDATE",
-        //   payload: experimentState.screen,
-        // });
-        console.log("WERE replacing with no screen change");
       }
       if (type === "POP") {
         if (experimentState.screen.nextRoundPage) {
@@ -144,38 +127,17 @@ const ExperimentProvider = ({ children }) => {
           });
         }
         if (experimentState.screen.firstRoute) {
-          console.log(
-            "popping on the first route?",
-            experimentState.screen,
-            location.state,
-            "curr:",
-            currentScreenIndex,
-            "prev:",
-            prevLocationIndex
-          );
-          // navigate("/", { state: experimentState.screen, replace: false });
           navigate("/", { state: null, replace: true });
           dispatchExperimentState({
             type: "FORCESCREENUPDATE",
             payload: experimentState.screen,
           });
-          if (currentScreenIndex < prevLocationIndex) {
-            console.log(
-              "in first route and are popping",
-              experimentState.screen,
-              location.state
-            );
-            // dispatchExperimentState({
-            //   type: "FORCESCREENUPDATE",
-            //   payload: experimentState.screen,
-            // });
-          }
-          // else {
-          //   navigate("/", { state: null, replace: true });
-          //   // dispatchExperimentState({
-          //   //   type: "FORCESCREENUPDATE",
-          //   //   payload: experimentState.screen,
-          //   // });
+          // if (currentScreenIndex < prevLocationIndex) {
+          //   console.log(
+          //     "in first route and are popping",
+          //     experimentState.screen,
+          //     location.state
+          //   );
           // }
         }
       }
@@ -188,9 +150,9 @@ const ExperimentProvider = ({ children }) => {
         return configScreen.screen === state.screen?.screen;
       }
     );
-    switch (action.type) {
-      // case "PROCEEDWITHNEXT":
+    const currentItem = state.items.indexOf(state.item);
 
+    switch (action.type) {
       case "PROCEED":
         return {
           ...state,
@@ -206,11 +168,21 @@ const ExperimentProvider = ({ children }) => {
           ...state,
           screen: action.payload,
         };
+      case "SKIPROUND":
+        // window.location.reload();
+
+        //still need final screen logic
+
+        return {
+          ...state,
+          screen: action.payload,
+          item: state.items[currentItem + 1],
+        };
+
       case "STARTNEXTROUND":
         // window.location.reload();
 
         //still need final screen logic
-        const currentItem = state.items.indexOf(state.item);
 
         return {
           ...state,
