@@ -14,10 +14,10 @@ export default function Screen7(props) {
 
       <div>
         <button onClick={() => dispatchExperimentState({ type: "RETURN" })}>
-          Return
+          KEEP SHOPPING
         </button>
         <button onClick={() => dispatchExperimentState({ type: "PROCEED" })}>
-          Proceed
+          ADD TO CART
         </button>
       </div>
     </div>

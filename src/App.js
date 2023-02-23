@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  useNavigation,
+} from "react-router-dom";
 import { useExperimentContext } from "./ExperimentProvider";
 import Overlay from "./Overlay";
 import { ScreenList } from "./screens/ScreenList";
@@ -7,21 +13,9 @@ import "./styles.css";
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { experimentState } = useExperimentContext();
-  console.log("experimentState", experimentState);
-  //should be created dynamically from screen config
-
-  //should be taken care of elsewhere?
-  // const initPage = "PAGE2";
-
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (location.state !== initPage) {
-  //     setCanDisplay(true);
-  //     navigate("/", { state: initPage });
-  //   }
-  // }, []);
 
   const ScreenView =
     ScreenList[location?.state?.screen || experimentState?.screen?.screen];
@@ -36,13 +30,6 @@ export default function App() {
         <Routes>
           <Route path="/" element={<ScreenView />} />
         </Routes>
-        {/* {location.state ? (
-          <Routes>
-            <Route path="/" element={<ScreenView />} />
-          </Routes>
-        ) : (
-          <ScreenView />
-        )} */}
       </div>
     </div>
   );

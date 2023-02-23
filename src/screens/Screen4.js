@@ -3,11 +3,8 @@ import { useEffectOnce } from "react-use";
 import { useExperimentContext } from "../ExperimentProvider";
 
 export default function Screen4(props) {
-  const {
-    experimentState,
-    dispatchExperimentState,
-    setValue
-  } = useExperimentContext();
+  const { experimentState, dispatchExperimentState, setValue } =
+    useExperimentContext();
   const [display, setDisplay] = useState("none");
 
   useEffectOnce(() => {
@@ -31,7 +28,7 @@ export default function Screen4(props) {
       <div>
         <button onClick={proceedWithNext}>Next Product</button>
         <button onClick={() => dispatchExperimentState({ type: "PROCEED" })}>
-          Proceed
+          Keep Shopping
         </button>
       </div>
     </div>

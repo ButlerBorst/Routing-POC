@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ScreenConfig } from "../Exp1Config";
 import { useExperimentContext } from "../ExperimentProvider";
 
 export default function Screen8(props) {
-  const {
-    experimentState,
-    dispatchExperimentState,
-    remove,
-    setValue,
-    value
-  } = useExperimentContext();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const { experimentState, dispatchExperimentState, remove, setValue, value } =
+    useExperimentContext();
 
   const finishCurrentRound = () => {
     if (value === "LASTITEM") {
@@ -30,6 +29,8 @@ export default function Screen8(props) {
       </div>
 
       <div>
+        <button onClick={() => navigate(-1)}>KEEP SHOPPING</button>
+
         <button onClick={finishCurrentRound}>ADD TO CART FINAL</button>
       </div>
     </div>

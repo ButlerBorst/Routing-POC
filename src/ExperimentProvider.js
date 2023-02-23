@@ -3,7 +3,7 @@ import {
   useActionData,
   useLocation,
   useNavigate,
-  useNavigationType
+  useNavigationType,
 } from "react-router-dom";
 import { ScreenConfig } from "./Exp1Config";
 import { useLocalStorage, usePrevious } from "react-use";
@@ -13,7 +13,7 @@ const initState = {
   screen: ScreenConfig.screens[0],
   cart: [],
   item: "Backpack",
-  items: ["Backpack", "Grapes", "Car Accesories", "Stickers", "LASTITEM"]
+  items: ["Backpack", "Grapes", "Car Accesories", "Stickers", "LASTITEM"],
 };
 const ExperimentContext = createContext(initState);
 export const useExperimentContext = () => useContext(ExperimentContext);
@@ -29,6 +29,7 @@ const ExperimentProvider = ({ children }) => {
     ExpermientStateReducer,
     initState
   );
+  console.log("experimentState: ", experimentState.screen);
 
   const [value, setValue, remove] = useLocalStorage("routing-test", null);
 
@@ -39,11 +40,17 @@ const ExperimentProvider = ({ children }) => {
       });
       dispatchExperimentState({
         type: "FORCESCREENUPDATE",
-        payload: nextRoundPage
+        payload: nextRoundPage,
       });
       dispatchExperimentState({
         type: "SETCARTITEM",
-        payload: value
+        payload: value,
+      });
+    } else {
+      navigate("/", { state: null, replace: true });
+      dispatchExperimentState({
+        type: "FORCESCREENUPDATE",
+        payload: ScreenConfig.screens[0],
       });
     }
   }, []);
@@ -58,12 +65,11 @@ const ExperimentProvider = ({ children }) => {
         navigate("/", { state: experimentState.screen, replace: true });
         navigate("/", { state: initRoute, replace: false });
         dispatchExperimentState({
-          type: "PROCEED"
+          type: "PROCEED",
         });
       } else {
         if (!isEqual(experimentState.screen, location.state)) {
           console.log("we arent equal and should navigate?");
-
           navigate("/", { state: experimentState.screen, replace: false });
         } else {
           console.log("WE ARE THE SAME NO NEED TO RENAV");
@@ -81,21 +87,21 @@ const ExperimentProvider = ({ children }) => {
       if (experimentState.screen.screenType === "overlay") {
         dispatchExperimentState({
           type: "FORCESCREENUPDATE",
-          payload: location.state
+          payload: location.state,
         });
       }
 
+      const currentScreenIndex = ScreenConfig.screens.findIndex(
+        (configScreen) => {
+          return configScreen.screen === location?.state?.screen;
+        }
+      );
+      const prevLocationIndex = ScreenConfig.screens.findIndex(
+        (configScreen) => {
+          return configScreen.screen === prevLocation?.state?.screen;
+        }
+      );
       if (experimentState.screen.screenType === "route") {
-        const currentScreenIndex = ScreenConfig.screens.findIndex(
-          (configScreen) => {
-            return configScreen.screen === location?.state?.screen;
-          }
-        );
-        const prevLocationIndex = ScreenConfig.screens.findIndex(
-          (configScreen) => {
-            return configScreen.screen === prevLocation?.state?.screen;
-          }
-        );
         console.log(currentScreenIndex, prevLocationIndex);
         if (prevLocationIndex === currentScreenIndex) {
           console.log("WERE THE SAME");
@@ -104,22 +110,65 @@ const ExperimentProvider = ({ children }) => {
           if (!isEqual(location.state, experimentState.screen)) {
             console.log("RETURNING?");
             dispatchExperimentState({
-              type: "RETURN"
+              type: "RETURN",
             });
           }
         }
         if (currentScreenIndex > prevLocationIndex) {
           if (!isEqual(location.state, experimentState.screen)) {
-            console.log("PROCEEDING?");
-            dispatchExperimentState({
-              type: "PROCEED"
-            });
+            console.log("PROCEEDING?", experimentState.screen);
+            if (!experimentState.screen.firstRoute) {
+              dispatchExperimentState({
+                type: "PROCEED",
+              });
+            }
           }
         }
       }
 
       if (type === "REPLACE") {
+        dispatchExperimentState({
+          type: "FORCESCREENUPDATE",
+          payload: experimentState.screen,
+        });
         console.log("WERE replacing with no screen change");
+      }
+      if (type === "POP") {
+        if (experimentState.screen.nextRoundPage) {
+          dispatchExperimentState({
+            type: "FORCESCREENUPDATE",
+            payload: experimentState.screen,
+          });
+        }
+        if (experimentState.screen.firstRoute) {
+          console.log(
+            "popping on the first route?",
+            experimentState.screen,
+            location.state,
+            "curr:",
+            currentScreenIndex,
+            "prev:",
+            prevLocationIndex
+          );
+          if (currentScreenIndex > prevLocationIndex) {
+            console.log(
+              "in first route and are popping",
+              experimentState.screen,
+              location.state
+            );
+            navigate("/", { state: null, replace: true });
+            dispatchExperimentState({
+              type: "FORCESCREENUPDATE",
+              payload: experimentState.screen,
+            });
+          } else {
+            navigate("/", { state: null, replace: true });
+            // dispatchExperimentState({
+            //   type: "FORCESCREENUPDATE",
+            //   payload: experimentState.screen,
+            // });
+          }
+        }
       }
     }
   }, [type, location]);
@@ -136,27 +185,33 @@ const ExperimentProvider = ({ children }) => {
       case "PROCEED":
         return {
           ...state,
-          screen: ScreenConfig.screens[currentScreenIndex + 1]
+          screen: ScreenConfig.screens[currentScreenIndex + 1],
         };
       case "RETURN":
         return {
           ...state,
-          screen: ScreenConfig.screens[currentScreenIndex - 1]
+          screen: ScreenConfig.screens[currentScreenIndex - 1],
         };
       case "FORCESCREENUPDATE":
         return {
           ...state,
-          screen: action.payload
+          screen: action.payload,
         };
       case "STARTNEXTROUND":
-        window.location.reload();
+        // window.location.reload();
+
+        //still need final screen logic
+        const currentItem = state.items.indexOf(state.item);
+
         return {
-          ...state
+          ...state,
+          screen: ScreenConfig.screens[currentScreenIndex + 1],
+          item: state.items[currentItem + 1],
         };
       case "SETCARTITEM":
         return {
           ...state,
-          item: action.payload
+          item: action.payload,
         };
       default:
         console.warn("UNKNOWN ACTION TYPE", action);
@@ -171,7 +226,7 @@ const ExperimentProvider = ({ children }) => {
         dispatchExperimentState,
         setValue,
         value,
-        remove
+        remove,
       }}
     >
       {children}

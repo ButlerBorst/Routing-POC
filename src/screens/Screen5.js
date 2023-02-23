@@ -17,7 +17,7 @@ export default function Screen5(props) {
           Return
         </button> */}
         <button onClick={() => dispatchExperimentState({ type: "PROCEED" })}>
-          Proceed
+          PROCEED
         </button>
       </div>
     </div>

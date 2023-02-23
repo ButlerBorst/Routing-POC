@@ -4,22 +4,18 @@ import { ScreenConfig } from "../Exp1Config";
 import { useExperimentContext } from "../ExperimentProvider";
 
 export default function Screen9(props) {
-  const {
-    experimentState,
-    dispatchExperimentState,
-    setValue,
-    value,
-    remove
-  } = useExperimentContext();
-  // const navigate = useNavigate();
+  const { experimentState, dispatchExperimentState, setValue, value, remove } =
+    useExperimentContext();
+  const navigate = useNavigate();
 
   const startNextRound = () => {
     const firstRoute = ScreenConfig.screens.find((configScreen) => {
       return configScreen.firstRoute;
     });
+    navigate("/", { state: null });
     dispatchExperimentState({
       type: "FORCESCREENUPDATE",
-      payload: firstRoute
+      payload: firstRoute,
     });
   };
   return (
